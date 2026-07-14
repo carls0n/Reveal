@@ -1,6 +1,6 @@
 # Reveal
 Reveal was written to find ANY hidden LKM rootkit. Guaranteed! It doesn't matter what method is used to hide the LKM rootkit, Reveal will find it!
-Bypasses every attempt to conceal an LKM rootkit. Even modules hidden using kobj will be easily found. Even LKM rootkit that hide from meory scanning will be found!
+Bypasses every attempt to conceal an LKM rootkit. Even modules hidden using kobj will be easily found. Even LKM rootkit that hide from memory scanning will be found!
 Reveal doesnt use ANY of those methods to find hidden LKM rootkits! Unlike any other method that attempts to find hidden LKM rootkits, reveal uses kill signals to identify installed and hidden LKM rootkits!
 <br><br>
 First, lets's compile reveal

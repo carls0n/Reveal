@@ -28,6 +28,8 @@ int get_module_list(char list[max_modules][name_size]) {
 }
 
 int main() {
+    int total_found = 0; // Tracks if any LKM was discovered across all 64 signals
+
     printf("[*] Starting isolated 1-64 signal scan for hidden LKMs...\n");
 
     for (int sig = 1; sig <= 64; sig++) {
@@ -74,6 +76,7 @@ int main() {
                     printf("[+] Detected Module: %s\n", after_list[i]);
                     printf("[+] Actions to take - sudo rmmod -f %s\n", after_list[i]);
                     found_lkm = 1;
+                    total_found++;
                 }
             }
 
@@ -92,6 +95,7 @@ int main() {
                         printf("[+] Detected Module: %s\n", before_list[i]);
                         printf("[+] Actions to take - sudo rmmod -f %s\n", before_list[i]);
                         found_lkm = 1;
+                        total_found++;
                         
                         pid_t reset_pid = fork();
                         if (reset_pid == 0) {
@@ -104,11 +108,15 @@ int main() {
                     }
                 }
             }
-
         }
     }
 
-    printf("\n[*] Scan complete. Hidden entries are now permanently exposed.\n");
+    printf("\n--- Final Status ---\n");
+    if (total_found == 0) {
+        printf("[*] Scan complete. No hidden modules found.\n");
+    } else {
+        printf("[*] Scan complete. Hidden entries are now permanently exposed.\n");
+    }
+
     return EXIT_SUCCESS;
 }
-

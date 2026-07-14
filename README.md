@@ -12,4 +12,4 @@ Ready to run reveal and find any hidden LKM rootkits!
 ./reveal
 ```
 
-Reveal will quickly find any hidden rootkit and unhide the module so that you can safely remove the rootkit.
+You can use my <a href="https://github.com/carls0n/rootkit">Hide Only LKM</a> for research.

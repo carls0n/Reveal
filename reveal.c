@@ -77,6 +77,7 @@ int main() {
                     printf("[+] Actions to take - sudo rmmod -f %s\n", after_list[i]);
                     found_lkm = 1;
                     total_found++;
+                    break; // Exit the loop comparing modules
                 }
             }
 
@@ -105,9 +106,15 @@ int main() {
                         } else {
                             waitpid(reset_pid, &status, 0);
                         }
+                        break; // Exit the loop comparing modules
                     }
                 }
             }
+        }
+
+        // Immediately break out of the 1-64 signal loop if a module was found
+        if (total_found > 0) {
+            break;
         }
     }
 

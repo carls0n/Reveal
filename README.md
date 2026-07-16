@@ -1,7 +1,8 @@
 # Reveal
 Reveal was written to find most LKM rootkits by utilizing signal scanning.
 Even modules hidden using kobj will be easily found. Even LKM rootkits that hide from memory scanning will be found!
-Reveal doesnt use ANY of those methods to find hidden LKM rootkits! Reveal uses kill signals (1-64) to identify installed and hidden LKM rootkits that use a kill signal (1-64) to toggle visibility. A couple of rootkit examples that can be found via signal scanning are <a href="https://github.com/m0nad/Diamorphine">Diamorphine</a> and <a href="https://github.com/brosck/Rebellion">Rebellion</a>
+Reveal doesnt use ANY of those methods to find hidden LKM rootkits! Reveal uses kill signals (1-64) to identify installed and hidden LKM rootkits that use a kill signal (1-64) to toggle visibility. A couple of rootkit examples that can be found via signal scanning are <a href="https://github.com/m0nad/Diamorphine">Diamorphine</a> and <a href="https://github.com/brosck/Rebellion">Rebellion</a><br><br>
+Unfortunately, it is trivial to change this behavior of rootkits and this tool should not be thought of as a comprehensive solution but rather another tool in your arsenal.
 <br><br>
 First, lets's compile reveal
 ```

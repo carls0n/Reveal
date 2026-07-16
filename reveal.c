@@ -11,19 +11,27 @@
 #define name_size 256
 
 int get_module_list(char list[max_modules][name_size]) {
-    DIR *d = opendir("/sys/module");
-    if (!d) return 0;
+    FILE *f = fopen("/proc/modules", "r");
+    if (!f) return 0;
     
-    struct dirent *dir;
+    char line[512];
     int count = 0;
-    while ((dir = readdir(d)) != NULL && count < max_modules) {
-        if (dir->d_name[0] != '.') { 
-            strncpy(list[count], dir->d_name, name_size - 1);
-            list[count][name_size - 1] = '\0';
+    
+    // Read line by line, extracting the first word (the module name)
+    while (fgets(line, sizeof(line), f) && count < max_modules) {
+        // Read up until the first space character
+        char *space = strchr(line, ' ');
+        if (space) {
+            size_t len = space - line;
+            if (len >= name_size) len = name_size - 1;
+            
+            strncpy(list[count], line, len);
+            list[count][len] = '\0';
             count++;
         }
     }
-    closedir(d);
+    
+    fclose(f);
     return count;
 }
 

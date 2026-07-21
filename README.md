@@ -12,5 +12,3 @@ Ready to run reveal and find hidden LKM rootkits!
 ```
 ./reveal
 ```
-
-You can use my Advanced Ultra Stealth <a href="https://github.com/carls0n/rootkit">Hide Only LKM</a> for research.

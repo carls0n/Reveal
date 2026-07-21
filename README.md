@@ -10,6 +10,15 @@ First, lets's compile reveal
 gcc -o reveal reveal.c
 ```
 Ready to run reveal and find hidden LKM rootkits!
+
 ```
-./reveal
+marc@archlinux~$ ./reveal
+[*] Starting isolated 1-64 signal scan for hidden LKMs...
+
+[!] ALERT: Hidden module revealed itself!
+[+] Detected Module: diamorphine
+[+] Actions to take - sudo rmmod -f diamorphine
+
+--- Final Status ---
+[*] Scan complete. Hidden entries are now permanently exposed.
 ```

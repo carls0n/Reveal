@@ -17,7 +17,7 @@ marc@archlinux~$ ./reveal
 
 [!] ALERT: Hidden module revealed itself!
 [+] Detected Module: diamorphine
-[+] Actions to take - sudo rmmod -f diamorphine
+[+] Actions to take - sudo rmmod diamorphine
 
 --- Final Status ---
 [*] Scan complete. Hidden entries are now permanently exposed.

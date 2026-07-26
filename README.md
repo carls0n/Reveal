@@ -22,5 +22,4 @@ marc@archlinux~$ ./reveal
 --- Final Status ---
 [*] Scan complete. Hidden entries are now permanently exposed.
 ```
-You might also enjoy reading <a href="https://carls0n.github.io">defeating ftrace based LKM rootkits for fun and profit</a>
-
+You might also enjoy reading <a href="https://carls0n.github.io">defeating LKM and LD_PRELOAD rootkits for fun and profit</a>

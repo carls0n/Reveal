@@ -1,25 +1,25 @@
 <img width="1370" height="798" alt="reveal2" src="https://github.com/user-attachments/assets/21e11a21-6f2e-4a76-acd6-5592dc1ef689" />
 
-Reveal was written to find LKM rootkits by using signal scanning.
-Even modules hidden using kobj will be easily found. Even LKM rootkits that hide from memory scanning will be found!
-Reveal doesnt use ANY of those methods to find hidden LKM rootkits! Reveal uses kill signals (1-64) to identify installed and hidden LKM rootkits that use a kill signal (1-64) to toggle visibility. A couple of rootkit examples that can be found via signal scanning are <a href="https://github.com/m0nad/Diamorphine">Diamorphine</a> and <a href="https://github.com/brosck/Rebellion">Rebellion</a><br><br>
-Unfortunately, it is trivial to change this behavior of rootkits and evade signal scanning. This tool should not be thought of as a comprehensive solution but rather another tool in your arsenal.
-<br><br>
+## Reveal 2.0 is here!
+Reveal 2.0 takes a two phase approach to finding hidden LKM rootkits. The first phase includes scanning for a response to a kill signal (1-64). If a rootkit is found, it is made visible so that it can be safely removed. In phase two, /proc/modules is cross checked with sysfs to find discrepancies. It also checks initstate, ignoring built-in modules and identifies dynamically loaded modules, like rootkits.
+
 First, lets's compile reveal
 ```
-gcc -o reveal reveal.c
+gcc -o reveal2 reveal2.c
 ```
 Ready to run reveal and find hidden LKM rootkits!
 
 ```
-marc@archlinux~$ ./reveal
-[*] Starting isolated 1-64 signal scan for hidden LKMs...
+# sudo ./reveal2
+[*] Phase 1: Beginning isolated 1-64 signal scan for hidden LKMs...
+[*] Phase 2: Beginning SYSFS cross-reference tracking...
 
-[!] ALERT: Hidden module revealed itself!
-[+] Detected Module: diamorphine
-[+] Actions to take - sudo rmmod diamorphine
+[CRITICAL] Hidden Rootkit Revealed Via Signal 63:
+           -> Target Identity: diamorphine
+           -> Remediation: sudo rmmod diamorphine
 
---- Final Status ---
-[*] Scan complete. Hidden entries are now permanently exposed.
+[*] Note: Rootkit exposed and localized via signal validation mechanisms.
 ```
+If you get a result that indicates a kill signal could not be found, you should reboot and run the scan again. This will resolve the problem if a rootkit has not been made persistent. If, after rebooting, the scan still indicates the presence of a rootkit, it is being made persistent by some other means. Check my paper below. In particular, the sectiton titled "What if a reboot doesn't clear the kernel of suspected rootkit?" While these suggestions do not include every possibility, they do include common methods for making a module persistent.
+
 You might also enjoy reading <a href="https://carls0n.github.io">defeating LKM and LD_PRELOAD rootkits for fun and profit</a>

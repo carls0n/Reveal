@@ -8,7 +8,6 @@
 #include <sys/syscall.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
 #define MAX_MODULES 512
 #define MODULE_NAME_LEN 64
@@ -19,7 +18,7 @@ int visible_count = 0;
 
 // Structure to buffer discovery events until both phases finish execution
 typedef struct {
-    int type; // 1 = Phase 1 Revealed, 2 = Phase 1 Toggled Off, 3 = Phase 2 Sysfs
+    int type; // 1 = Phase 1 Revealed (Scenario A), 2 = Phase 1 Toggled Off (Scenario B), 3 = Phase 2 Sysfs
     int sig;
     char name[MODULE_NAME_LEN];
 } Discovery;
@@ -31,38 +30,39 @@ int total_discoveries = 0;
 int get_module_list(char list[MAX_MODULES][MODULE_NAME_LEN]) {
     FILE *f = fopen("/proc/modules", "r");
     if (!f) return 0;
-    
-    char line[512];
+         
+    char line[512]; 
     int count = 0;
-    
+         
     while (fgets(line, sizeof(line), f) && count < MAX_MODULES) {
         char *space = strchr(line, ' ');
         if (space) {
             size_t len = space - line;
             if (len >= MODULE_NAME_LEN) len = MODULE_NAME_LEN - 1;
-            
+                         
             strncpy(list[count], line, len);
             list[count][len] = '\0';
             count++;
         }
     }
-    
+         
     fclose(f);
     return count;
 }
 
 // Helper to determine if /sys/module/<name>/initstate exists
 bool has_initstate(const char *mod_name) {
-    char path[512];
+    char path[512]; 
     struct stat st;
-    
+         
     snprintf(path, sizeof(path), "/sys/module/%s/initstate", mod_name);
     return (stat(path, &st) == 0);
 }
 
 // Method 1: Tries to provoke rootkit toggles via POSIX signals (1-64)
 int scan_hidden_modules_via_signals(void) {
-    int phase1_found = 0; 
+    int phase1_found = 0;
+
     printf("[*] Phase 1: Beginning isolated 1-64 signal scan for hidden LKMs...\n");
 
     for (int sig = 1; sig <= 64; sig++) {
@@ -82,7 +82,7 @@ int scan_hidden_modules_via_signals(void) {
         }
 
         if (pid == 0) {
-            setsid(); 
+            setsid();
             syscall(SYS_kill, 0, sig);
             exit(EXIT_SUCCESS);
         } else {
@@ -112,7 +112,7 @@ int scan_hidden_modules_via_signals(void) {
                     }
                     found_lkm = 1;
                     phase1_found++;
-                    break; 
+                    break;
                 }
             }
 
@@ -136,7 +136,7 @@ int scan_hidden_modules_via_signals(void) {
                         }
                         found_lkm = 1;
                         phase1_found++;
-                        
+                                                 
                         pid_t reset_pid = fork();
                         if (reset_pid == 0) {
                             setsid();
@@ -145,10 +145,15 @@ int scan_hidden_modules_via_signals(void) {
                         } else {
                             waitpid(reset_pid, &status, 0);
                         }
-                        break; 
+                        break;
                     }
                 }
             }
+        }
+
+        // Halt Phase 1 loop early if an entry is caught
+        if (phase1_found > 0) {
+            break;
         }
     }
 
@@ -167,7 +172,6 @@ int scan_sysfs_discrepancies(void) {
     int sysfs_found = 0;
     printf("[*] Phase 2: Beginning SYSFS cross-reference tracking...\n");
     sleep(2);
-    // Fresh load of visible modules right before checking
     visible_count = get_module_list(visible_modules);
 
     while ((entry = readdir(dir)) != NULL) {
@@ -175,9 +179,8 @@ int scan_sysfs_discrepancies(void) {
             continue;
         }
 
-        // Rule out core built-in kernel subsystems
         if (!has_initstate(entry->d_name)) {
-            continue; 
+            continue;
         }
 
         bool found = false;
@@ -188,7 +191,6 @@ int scan_sysfs_discrepancies(void) {
             }
         }
 
-        // Module exists inside sysfs runtime directories but is stripped out of /proc/modules
         if (!found) {
             if (total_discoveries < MAX_DISCOVERIES) {
                 discoveries[total_discoveries].type = 3;
@@ -205,22 +207,48 @@ int scan_sysfs_discrepancies(void) {
 }
 
 int main(int argc, char *argv[]) {
+    bool run_phase1 = true;
+    bool run_phase2 = true;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--skip-phase1") == 0) {
+            run_phase1 = false;
+        } else if (strcmp(argv[i], "--skip-phase2") == 0) {
+            run_phase2 = false;
+        } else {
+            fprintf(stderr, "Usage: %s [--skip-phase1] [--skip-phase2]\n", argv);
+            return EXIT_FAILURE;
+        }
+    }
+
     if (getuid() != 0) {
         fprintf(stderr, "[*] Error: This utility must be executed with root (sudo) privileges.\n");
         return EXIT_FAILURE;
     }
 
-    // Both functions run back-to-back completely silent to the terminal screen
-    int signal_discoveries = scan_hidden_modules_via_signals();
-    int sysfs_discoveries = scan_sysfs_discrepancies();
-    
-    // Critical alert blocks print here, entirely AFTER Phase 2 finishes
+    int signal_discoveries = 0;
+    int sysfs_discoveries = 0;
+
+    if (run_phase1) {
+        signal_discoveries = scan_hidden_modules_via_signals();
+    }
+    if (run_phase2) {
+        sysfs_discoveries = scan_sysfs_discrepancies();
+    }
+         
+    // Track specific Phase 1 scenario results for the final message strings
+    bool scenario_a_happened = false;
+    bool scenario_b_happened = false;
+
+    // Unified output summary block
     for (int i = 0; i < total_discoveries; i++) {
         if (discoveries[i].type == 1) {
+            scenario_a_happened = true;
             printf("\n[CRITICAL] Hidden Rootkit Revealed Via Signal %d:\n", discoveries[i].sig);
             printf("           -> Target Identity: %s\n", discoveries[i].name);
             printf("           -> Remediation: sudo rmmod %s\n", discoveries[i].name);
         } else if (discoveries[i].type == 2) {
+            scenario_b_happened = true;
             printf("\n[CRITICAL] Rootkit Detected (Toggled Off Via Signal %d):\n", discoveries[i].sig);
             printf("           -> Target Identity: %s\n", discoveries[i].name);
             printf("           -> Remediation: sudo rmmod %s\n", discoveries[i].name);
@@ -233,16 +261,16 @@ int main(int argc, char *argv[]) {
     }
 
     // Print message if an LKM was found in sysfs discrepancies, but no valid kill signal response triggered it
-    if (sysfs_discoveries > 0 && signal_discoveries == 0) {
+    if (run_phase2 && sysfs_discoveries > 0 && signal_discoveries == 0 && run_phase1) {
         printf("\n[*] Notice: A rootkit was caught by SYSFS, but failed to find a valid kill signal.\n");
-    } else if (signal_discoveries > 0) {
+    // MODIFIED: Only print this note if Phase 1 ran and explicitly uncovered Scenario A (Type 1)
+    } else if (run_phase1 && signal_discoveries > 0 && scenario_a_happened && !scenario_b_happened) {
         printf("\n[*] Note: Rootkit exposed and localized via signal validation mechanisms.\n");
     }
 
-    // Final clean scan termination text conditional configuration block
     if (total_discoveries == 0) {
         printf("[*] Scan complete. No rootkits were found.\n");
     }
+
     return EXIT_SUCCESS;
 }
-

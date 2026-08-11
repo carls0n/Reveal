@@ -261,10 +261,10 @@ int main(int argc, char *argv[]) {
     }
 
     // Print message if an LKM was found in sysfs discrepancies, but no valid kill signal response triggered it
-    if (run_phase2 && sysfs_discoveries > 0 && signal_discoveries == 0 && run_phase1) {
+    if (run_phase2 && sysfs_discoveries > 0 && signal_discoveries == 0) {
         printf("\n[*] Notice: A rootkit was caught by SYSFS, but failed to find a valid kill signal.\n");
     // MODIFIED: Only print this note if Phase 1 ran and explicitly uncovered Scenario A (Type 1)
-    } else if (run_phase1 && signal_discoveries > 0 && scenario_a_happened && !scenario_b_happened) {
+    } else if (run_phase1 && signal_discoveries > 0 && scenario_a_happened) {
         printf("\n[*] Note: Rootkit exposed and localized via signal validation mechanisms.\n");
     }
 

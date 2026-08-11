@@ -18,6 +18,10 @@ Ready to run reveal and find hidden LKM rootkits!
 
 [*] Note: Rootkit exposed and localized via signal validation mechanisms.
 ```
+You can also skip a phase like this
+```
+sudo ./reveal2 --skip-phase1
+```
 If you get a result that indicates a kill signal could not be found, you should reboot and run the scan again. This will resolve the problem if a rootkit has not been made persistent. If, after rebooting, the scan still indicates the presence of a rootkit, it is being made persistent by some other means. Check my paper below. In particular, the sectiton titled "What if a reboot doesn't clear the kernel of suspected rootkit?" While these suggestions do not include every possibility, they do include common methods for making a module persistent.
 
 You might also enjoy reading <a href="https://carls0n.github.io">defeating LKM and LD_PRELOAD rootkits for fun and profit</a>

@@ -11,12 +11,9 @@ Ready to run reveal and find hidden LKM rootkits!
 # sudo ./reveal2
 [*] Phase 1: Beginning isolated 1-64 signal scan for hidden LKMs...
 [*] Phase 2: Beginning SYSFS cross-reference tracking...
-
-[CRITICAL] Hidden Rootkit Revealed Via Signal 63:
-           -> Target Identity: diamorphine
-           -> Remediation: sudo rmmod diamorphine
-
-[*] Note: Rootkit exposed and localized via signal validation mechanisms.
+[*] Hidden Rootkit Revealed Via Signal 63:
+[*] Target Identity: diamorphine
+[*] Remediation: sudo rmmod diamorphine
 ```
 You can also skip a phase like this
 ```

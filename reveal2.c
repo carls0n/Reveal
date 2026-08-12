@@ -244,28 +244,20 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < total_discoveries; i++) {
         if (discoveries[i].type == 1) {
             scenario_a_happened = true;
-            printf("\n[CRITICAL] Hidden Rootkit Revealed Via Signal %d:\n", discoveries[i].sig);
-            printf("           -> Target Identity: %s\n", discoveries[i].name);
-            printf("           -> Remediation: sudo rmmod %s\n", discoveries[i].name);
+            printf("[*] Hidden Rootkit Revealed Via Signal %d:\n", discoveries[i].sig);
+            printf("[*] Target Identity: %s\n", discoveries[i].name);
+            printf("[*] Remediation: sudo rmmod %s\n", discoveries[i].name);
         } else if (discoveries[i].type == 2) {
             scenario_b_happened = true;
-            printf("\n[CRITICAL] Rootkit Detected (Toggled Off Via Signal %d):\n", discoveries[i].sig);
-            printf("           -> Target Identity: %s\n", discoveries[i].name);
-            printf("           -> Remediation: sudo rmmod %s\n", discoveries[i].name);
+            printf("[*] Rootkit Detected (Toggled Off Via Signal %d):\n", discoveries[i].sig);
+            printf("[*] Target Identity: %s\n", discoveries[i].name);
+            printf("[*] Remediation: sudo rmmod %s\n", discoveries[i].name);
         } else if (discoveries[i].type == 3) {
-            printf("\n[CRITICAL] Unlinked LKM Rootkit Detected Via SYSFS Analysis:\n");
-            printf("           -> Target Identity: %s\n", discoveries[i].name);
-            printf("           -> Vector Analysis: Dynamically allocated but completely missing from /proc/modules.\n");
-            printf("           -> Remediation: Reboot and run this scan again.\n");
+            printf("[*] Hidden LKM Rootkit Detected Via SYSFS Analysis:\n");
+            printf("[*] Target Identity: %s\n", discoveries[i].name);
+           // printf("[*] Vector Analysis: Dynamically allocated but completely missing from /proc/modules.\n");
+            printf("[*] Remediation: Reboot and run this scan again.\n");
         }
-    }
-
-    // Print message if an LKM was found in sysfs discrepancies, but no valid kill signal response triggered it
-    if (run_phase2 && sysfs_discoveries > 0 && signal_discoveries == 0) {
-        printf("\n[*] Notice: A rootkit was caught by SYSFS, but failed to find a valid kill signal.\n");
-    // MODIFIED: Only print this note if Phase 1 ran and explicitly uncovered Scenario A (Type 1)
-    } else if (run_phase1 && signal_discoveries > 0 && scenario_a_happened) {
-        printf("\n[*] Note: Rootkit exposed and localized via signal validation mechanisms.\n");
     }
 
     if (total_discoveries == 0) {

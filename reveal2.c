@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(argv[i], "--skip-phase2") == 0) {
             run_phase2 = false;
         } else {
-            fprintf(stderr, "Usage: %s [--skip-phase1] [--skip-phase2]\n", argv);
+            fprintf(stderr, "Usage: %s [--skip-phase1] [--skip-phase2]\n", argv[0]);
             return EXIT_FAILURE;
         }
     }

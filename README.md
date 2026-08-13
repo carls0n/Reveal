@@ -1,3 +1,5 @@
+<img width="1000" height="450" alt="reveal3" src="https://github.com/user-attachments/assets/d6c4e9ef-6fd3-4e8c-88bc-27d2e99e3643" />
+
 ### Reveal 2.0 is released!
 Reveal 2.0 takes a two phase approach to finding hidden LKM rootkits. The first phase includes scanning for a response to a kill signal (1-64). If a rootkit is found, it is made visible so that it can be safely removed. In phase two, /proc/modules is cross checked with sysfs to find discrepancies. It also checks initstate, ignoring built-in modules and identifies dynamically loaded modules, like rootkits.
 

@@ -63,7 +63,7 @@ bool has_initstate(const char *mod_name) {
 int scan_hidden_modules_via_signals(void) {
     int phase1_found = 0;
 
-    printf("[*] Phase 1: Beginning isolated 1-64 signal scan for hidden LKMs...\n");
+    printf("[+] Phase 1: Beginning isolated 1-64 signal scan for hidden LKMs...\n");
 
     for (int sig = 1; sig <= 64; sig++) {
         if (sig == 9 || sig == 19 || sig == 32 || sig == 33) {
@@ -77,7 +77,7 @@ int scan_hidden_modules_via_signals(void) {
 
         pid_t pid = fork();
         if (pid < 0) {
-            perror("[-] Fork failed during signal scan");
+            perror("[!] Fork failed during signal scan");
             return 0;
         }
 
@@ -164,13 +164,13 @@ int scan_hidden_modules_via_signals(void) {
 int scan_sysfs_discrepancies(void) {
     DIR *dir = opendir("/sys/module");
     if (!dir) {
-        perror("[-] Failed to open /sys/module");
+        perror("[!] Failed to open /sys/module");
         return 0;
     }
 
     struct dirent *entry;
     int sysfs_found = 0;
-    printf("[*] Phase 2: Beginning SYSFS cross-reference tracking...\n");
+    printf("[+] Phase 2: Beginning SYSFS cross-reference tracking...\n");
     sleep(2);
     visible_count = get_module_list(visible_modules);
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (getuid() != 0) {
-        fprintf(stderr, "[*] Error: This utility must be executed with root (sudo) privileges.\n");
+        fprintf(stderr, "[!] Error: This utility must be executed with root (sudo) privileges.\n");
         return EXIT_FAILURE;
     }
 

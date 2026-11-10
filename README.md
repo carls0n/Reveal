@@ -1,4 +1,4 @@
-<img width="640" height="320" alt="reveal2" src="https://github.com/user-attachments/assets/2ae69863-87f6-4a98-a722-35c61f814276" />
+<img width="1280" height="640" alt="reveal2" src="https://github.com/user-attachments/assets/2ae69863-87f6-4a98-a722-35c61f814276" />
 
 
 ### Reveal 2.0 is released!
